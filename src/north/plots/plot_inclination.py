@@ -434,7 +434,7 @@ def inclination_gauge(
             showlegend=False
         ))
 
-    for deg in [-60, -45, -30, -20, -10, 10, 20, 30, 45, 60]:
+    for deg in range(-60, 61, 10):
         a = np.deg2rad(deg)
 
         r = 0.84
