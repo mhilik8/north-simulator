@@ -229,7 +229,7 @@ class Quaternion:
         cls,
         phi: ArrayLike,
         dtype: Type[np.floating] = np.float64,
-    ) -> "Quaternion":
+    ) -> Quaternion:
         """
         Exponential map from so(3) to SO(3).
 
