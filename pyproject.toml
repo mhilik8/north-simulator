@@ -1,0 +1,68 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "setuptools-scm>=7.1.0",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "north"
+description = "a package for north simulation"
+requires-python = ">=3.10"
+readme = "README.rst"
+keywords = [
+    'Condor Pacific LTD',
+    "north",
+    "simulation"
+]
+authors = [
+    { name="Reuven Mol", email="reuven@condorpacific.co.il" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = {file = "LICENSE"}
+dynamic = ["version"]
+dependencies = [
+    "numpy>=2.4.4",
+]
+
+[project.urls]
+"Homepage" = "https://bitbucket.org/Yosibuc/north-simulation"
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+    "pytest-cov",
+    "flake8",
+    "mypy"
+]
+docs = [
+    "sphinx",
+    "rinohtype",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-confluencebuilder"
+]
+release = ["twine"]
+
+[tool.setuptools.dynamic]
+version = {file = "src/north/VERSION"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=north"
+testpaths = [
+    "tests",
+]
+
+[tool.mypy]
+mypy_path = "src"
+disable_error_code = "import-untyped"
+ignore_missing_imports = "True"
+check_untyped_defs = "True"
+exclude = [
+]
