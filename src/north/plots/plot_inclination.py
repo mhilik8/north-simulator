@@ -7,6 +7,12 @@ import trimesh
 
 
 model_path = Path(__file__).parent / Path("pictures/11803_Airplane_v1_l1/11803_Airplane_v1_l1.obj")
+"""
+a 3D model of an Aircraft
+
+toked from here:
+https://free3d.com/3d-model/airplane-v1--79106.html
+"""
 
 SKY = "rgb(110,140,180)"
 EARTH = "rgb(120,90,70)"
@@ -17,14 +23,7 @@ def load_aircraft_mesh(model_path: str = str(model_path)) -> trimesh.Trimesh:
     mesh_or_scene = trimesh.load(model_path)
 
     if isinstance(mesh_or_scene, trimesh.Scene):
-
-        mesh = trimesh.util.concatenate(
-            tuple(
-                geometry
-                for geometry in mesh_or_scene.geometry.values()
-            )
-        )
-
+        mesh = trimesh.util.concatenate(tuple(geometry for geometry in mesh_or_scene.geometry.values()))
     else:
         mesh = mesh_or_scene
 
