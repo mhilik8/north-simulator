@@ -3,6 +3,13 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
+# Virtual Environment
+.venv/
+venv/
+
+# Egg file
+src/north.egg-info
+
 # Node artifact files
 node_modules/
 dist/
@@ -47,4 +54,3 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
-
