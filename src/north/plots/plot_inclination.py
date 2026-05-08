@@ -1,9 +1,19 @@
-from pathlib import Path
+"""
+================
+Plot inclination
+================
 
+:Author: Reuven Mol
+
+Graphical visualization for inclination
+"""
+
+from pathlib import Path
 import numpy as np
 import plotly.graph_objects as go
 from functools import cache
 import trimesh
+from north.plots.theme import *
 
 
 model_path = Path(__file__).parent / Path("pictures/11803_Airplane_v1_l1/11803_Airplane_v1_l1.obj")
@@ -13,9 +23,6 @@ a 3D model of an Aircraft
 toked from here:
 https://free3d.com/3d-model/airplane-v1--79106.html
 """
-
-SKY = "rgb(110,140,180)"
-EARTH = "rgb(120,90,70)"
 
 @cache
 def load_aircraft_mesh(model_path: str = str(model_path)) -> trimesh.Trimesh:
@@ -48,9 +55,6 @@ def load_aircraft_mesh(model_path: str = str(model_path)) -> trimesh.Trimesh:
 
     return vertices, faces
 
-
-def Rx(theta):
-    c = np.cos(theta)
 
 def Rx(theta):
     c = np.cos(theta)
@@ -129,7 +133,7 @@ def inclination_3d_view(
         k=[2, 3],
 
         opacity=0.35,
-        color="lightblue",
+        color=LOCAL_LEVEL_COLOR,
         showscale=False,
         name="local level"
     ))
@@ -161,8 +165,8 @@ def inclination_3d_view(
         y=[0, 0],
         z=[0, -1],
         mode="lines",
-        line=dict(width=8),
-        name="gravity"
+        line=dict(width=8, color=GRAVITY_COLOR),
+        name=GRAVITY_LABEL
     ))
 
     # =========================================================
@@ -306,7 +310,7 @@ def inclination_gauge(
         fill="toself",
         mode="lines",
         line=dict(width=0),
-        fillcolor=SKY,
+        fillcolor=SKY_COLOR,
         showlegend=False
     ))
 
@@ -336,7 +340,7 @@ def inclination_gauge(
         fill="toself",
         mode="lines",
         line=dict(width=0),
-        fillcolor=EARTH,
+        fillcolor=EARTH_COLOR,
         showlegend=False
     ))
 

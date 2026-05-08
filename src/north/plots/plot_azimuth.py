@@ -20,26 +20,26 @@ This module provides two complementary visualizations:
 
 from pathlib import Path
 import base64
-
 import numpy as np
 import plotly.graph_objects as go
-
 from north.plots.graphics_utils import rotated_image_uri
+from north.plots.theme import (
+    BACKGROUND_COLOR,
+    CARD_COLOR,
+    EARTH_ROTATION_COLOR,
+    EARTH_ROTATION_LABEL,
+    HIGHLIGHT_COLOR,
+    AIRCRAFT_SYMBOL_COLOR,
+)
 
 
 # =========================================================
 # ASSETS
 # =========================================================
 
-COMPASS_ROSE_PATH = (
-    Path(__file__).parent
-    / Path("pictures/compass-rose.jpg")
-)
+COMPASS_ROSE_PATH = Path(__file__).parent / Path("pictures/compass-rose.jpg")
 
-AIRCRAFT_TOP_PATH = (
-    Path(__file__).parent
-    / Path("pictures/airplane-top-view.png")
-)
+AIRCRAFT_TOP_PATH = Path(__file__).parent / Path("pictures/airplane-top-view.png")
 
 
 def _load_base64_image(path: Path) -> str:
@@ -53,19 +53,6 @@ def _load_base64_image(path: Path) -> str:
 
 COMPASS_ROSE = _load_base64_image(COMPASS_ROSE_PATH)
 AIRCRAFT_TOP = _load_base64_image(AIRCRAFT_TOP_PATH)
-
-
-# =========================================================
-# COLORS
-# =========================================================
-
-BACKGROUND = "#111111"
-CARD = "#1a1a1a"
-
-NORTH_COLOR = "rgb(80,160,255)"
-HEADING_COLOR = "rgb(255,180,80)"
-AIRCRAFT_COLOR = "white"
-
 
 # =========================================================
 # WORLD VIEW
@@ -110,7 +97,7 @@ def azimuth_world_view(
             source=COMPASS_ROSE,
             xref="x",
             yref="y",
-            x=-1.2,
+            x=-1.23,
             y=1.2,
             sizex=2.4,
             sizey=2.4,
@@ -124,10 +111,7 @@ def azimuth_world_view(
     # AIRCRAFT IMAGE
     # =====================================================
 
-    rotated_aircraft = rotated_image_uri(
-        str(AIRCRAFT_TOP_PATH),
-        -azimuth_deg
-    )
+    rotated_aircraft = rotated_image_uri(str(AIRCRAFT_TOP_PATH), -azimuth_deg)
 
     fig.add_layout_image(
         dict(
@@ -135,11 +119,11 @@ def azimuth_world_view(
             xref="x",
             yref="y",
 
-            x=-0.25,
-            y=0.25,
+            x=-1.1,
+            y=1.1,
 
-            sizex=0.5,
-            sizey=0.5,
+            sizex=2.2,
+            sizey=2.2,
 
             sizing="contain",
             opacity=1.0,
@@ -166,12 +150,12 @@ def azimuth_world_view(
         arrowhead=3,
         arrowsize=1.5,
         arrowwidth=4,
-        arrowcolor=NORTH_COLOR,
+        arrowcolor=EARTH_ROTATION_COLOR,
 
-        text="N",
+        text=EARTH_ROTATION_LABEL,
         font=dict(
             size=18,
-            color=NORTH_COLOR
+            color=EARTH_ROTATION_COLOR
         )
     )
 
@@ -200,7 +184,7 @@ def azimuth_world_view(
         arrowhead=3,
         arrowsize=1.5,
         arrowwidth=4,
-        arrowcolor=HEADING_COLOR,
+        arrowcolor=HIGHLIGHT_COLOR,
 
         text="",
     )
@@ -222,7 +206,7 @@ def azimuth_world_view(
 
         line=dict(
             width=4,
-            color=HEADING_COLOR
+            color=HIGHLIGHT_COLOR
         ),
 
         showlegend=False
@@ -244,7 +228,7 @@ def azimuth_world_view(
 
         textfont=dict(
             size=16,
-            color=HEADING_COLOR
+            color=HIGHLIGHT_COLOR
         ),
 
         showlegend=False
@@ -278,8 +262,8 @@ def azimuth_world_view(
         width=700,
         height=700,
 
-        plot_bgcolor=BACKGROUND,
-        paper_bgcolor=CARD,
+        plot_bgcolor=BACKGROUND_COLOR,
+        paper_bgcolor=CARD_COLOR,
 
         xaxis=dict(
             visible=False,
@@ -409,7 +393,7 @@ def azimuth_compass_view(
 
         line=dict(
             width=6,
-            color="yellow"
+            color=HIGHLIGHT_COLOR
         ),
 
         showlegend=False
@@ -465,7 +449,7 @@ def azimuth_compass_view(
         height=700,
 
         plot_bgcolor="black",
-        paper_bgcolor=CARD,
+        paper_bgcolor=CARD_COLOR,
 
         xaxis=dict(
             visible=False,

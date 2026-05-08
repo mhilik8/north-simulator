@@ -1,7 +1,19 @@
+"""
+=============
+plot latitude
+=============
+
+:Author: Reuven Mol
+
+plot latitude on earth model
+"""
+
 from pathlib import Path
 import numpy as np
 import plotly.graph_objects as go
 import base64
+from north.plots.theme import GRAVITY_COLOR, EARTH_ROTATION_COLOR, GRAVITY_LABEL, EARTH_ROTATION_LABEL, LOCAL_LEVEL_COLOR
+from north.plots.graphics_utils import add_arrow
 
 # =========================================================
 # LOAD LOCAL EARTH IMAGE
@@ -35,7 +47,7 @@ def latitude_view(latitude_deg: float):
     )
 
     # =========================================================
-    # SURFACE POINT (IMPORTANT FIX)
+    # SURFACE POINT
     # =========================================================
     p = np.array([np.cos(lat), np.sin(lat)])  # point on Earth
 
@@ -55,48 +67,14 @@ def latitude_view(latitude_deg: float):
     tangent = np.array([-p[1], p[0]])
 
     # =========================================================
-    # ARROW HELPER (annotations)
-    # =========================================================
-    def add_arrow(start, vec, name, color):
-        end = start + vec
-
-        fig.add_annotation(
-            x=end[0],
-            y=end[1],
-            ax=start[0],
-            ay=start[1],
-            xref="x",
-            yref="y",
-            axref="x",
-            ayref="y",
-            showarrow=True,
-            arrowhead=3,
-            arrowsize=1.3,
-            arrowwidth=3,
-            arrowcolor=color,
-            text="",
-        )
-
-        # label at arrow head
-        fig.add_trace(go.Scatter(
-            x=[end[0]],
-            y=[end[1]],
-            mode="text",
-            text=[name],
-            textposition="top center",
-            textfont=dict(color=color, size=16),
-            showlegend=False
-        ))
-
-    # =========================================================
     # DRAW VECTORS (ALL START AT SURFACE POINT)
     # =========================================================
 
     # gravity
-    add_arrow(p, 0.4 * g, "g", "red")
+    add_arrow(fig, 0.4 * g, GRAVITY_LABEL, GRAVITY_COLOR, p)
 
     # earth rotation axis projected in this plane (visual only)
-    add_arrow(p, 0.4 * omega, "Ω", "blue")
+    add_arrow(fig, 0.4 * omega, EARTH_ROTATION_LABEL, EARTH_ROTATION_COLOR, p)
 
     t0 = p + tangent * 0.4
     t1 = p - tangent * 0.4
@@ -107,7 +85,7 @@ def latitude_view(latitude_deg: float):
         y=[t0[1], t1[1]],
         mode="lines",
         name="Local level",
-        line=dict(dash="dash")
+        line=dict(dash="dash", color=LOCAL_LEVEL_COLOR),
     ))
 
     # =========================================================
