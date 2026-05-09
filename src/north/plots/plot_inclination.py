@@ -13,6 +13,7 @@ import numpy as np
 import plotly.graph_objects as go
 from functools import cache
 import trimesh
+from PIL import Image
 from north.plots.theme import *
 
 
@@ -24,6 +25,16 @@ toked from here:
 https://free3d.com/3d-model/airplane-v1--79106.html
 """
 
+def uv_to_colors(uv, texture):
+    img = np.array(texture) / 255.0
+    h, w = img.shape[:2]
+
+    u = (uv[:, 0] * (w - 1)).astype(int)
+    v = ((1 - uv[:, 1]) * (h - 1)).astype(int)
+
+    colors = img[v, u]
+    return colors
+
 @cache
 def load_aircraft_mesh(model_path: str = str(model_path)) -> trimesh.Trimesh:
 
@@ -34,8 +45,12 @@ def load_aircraft_mesh(model_path: str = str(model_path)) -> trimesh.Trimesh:
     else:
         mesh = mesh_or_scene
 
+    uv = mesh.visual.uv
+    texture = mesh.visual.material.image
+
     vertices = np.array(mesh.vertices)
     faces = np.array(mesh.faces)
+    colors = uv_to_colors(uv, texture)
 
     # =========================================================
     # CENTER MODEL
@@ -49,11 +64,11 @@ def load_aircraft_mesh(model_path: str = str(model_path)) -> trimesh.Trimesh:
     # =========================================================
 
     extent = vertices.max(axis=0) - vertices.min(axis=0)
-    scale = np.max(extent)
+    scale = np.max(extent) / 2
 
     vertices = vertices / scale
 
-    return vertices, faces
+    return vertices, faces, colors
 
 
 def Rx(theta):
@@ -90,7 +105,7 @@ def inclination_3d_view(
     # LOAD AIRCRAFT MODEL
     # =========================================================
 
-    vertices, faces = load_aircraft_mesh()
+    vertices, faces, colors = load_aircraft_mesh()
 
     # =========================================================
     # ROTATE MODEL
@@ -152,6 +167,7 @@ def inclination_3d_view(
         k=faces[:, 2],
 
         opacity=1.0,
+        vertexcolor=colors,
         flatshading=True,
         name="aircraft"
     ))

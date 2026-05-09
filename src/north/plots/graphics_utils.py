@@ -5,13 +5,13 @@ graphics utils
 
 :Author: Reuven Mol
 """
-from pathlib import Path
 import plotly.graph_objects as go
 from functools import cache
 from PIL import Image
 import io
 import base64
 import numpy as np
+
 
 ORIGIN = np.zeros(2)
 
@@ -118,7 +118,7 @@ def add_arrow(
     end = start + vec
 
     # label positioning
-    text_loc = start + 1.15 * vec
+    text_loc = start + 1.12 * vec
 
     # =========================================================
     # ARROW
@@ -155,7 +155,7 @@ def add_arrow(
         y=text_loc[1],
         text=rf"${name}$" if "\\" in name else name,
         showarrow=False,
-        font=dict(color=color, family="Noto Sans Math", size=16),
+        font=dict(color=color, family="Noto Sans Math", size=18),
         xanchor="center",
         yanchor="middle",
     )

@@ -9,7 +9,6 @@ Main educational physical-scene page.
 """
 
 from dash import dcc, html
-
 from north.webapp.content.scene_text import (
     LATITUDE_TEXT,
     AZIMUTH_TEXT,

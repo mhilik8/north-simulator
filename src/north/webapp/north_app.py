@@ -24,37 +24,22 @@ The goal is:
 4. future simulator foundation
 """
 
-from dash import Dash, Output, Input
-from north.webapp.pages.scene import layout as scene_layout
-from north.webapp.callbacks import update_scene
+from dash import Dash, html, dcc
+from north.webapp.router import page_container
+from north.webapp.components.navbar import navbar
+from north.webapp.callbacks.scene_callbacks import register_scene_callbacks
 
 
-# =========================================================
-# APPLICATION
-# =========================================================
+app = Dash(
+    __name__,
+    suppress_callback_exceptions=True,
+)
 
-app = Dash(__name__)
 
-# =========================================================
-# LAYOUT
-# =========================================================
+app.layout = html.Div([
+    dcc.Location(id="url"),
+    navbar,
+    page_container,
+])
 
-app.layout = scene_layout
-
-# =========================================================
-# CALLBACKS
-# =========================================================
-
-app.callback(
-    Output("latitude-graph", "figure"),
-    Output("azimuth-graph", "figure"),
-    Output("compass-graph", "figure"),
-    Output("inclination-3d-graph", "figure"),
-    Output("inclination-gauge-graph", "figure"),
-    Output("measurement-text", "children"),
-    Input("latitude-slider", "value"),
-    Input("azimuth-slider", "value"),
-    Input("pitch-slider", "value"),
-    Input("roll-slider", "value"),
-    Input("encoder-slider", "value"),
-)(update_scene)
+register_scene_callbacks(app)

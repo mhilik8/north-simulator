@@ -37,7 +37,7 @@ from north.plots.theme import (
 # ASSETS
 # =========================================================
 
-COMPASS_ROSE_PATH = Path(__file__).parent / Path("pictures/compass-rose.jpg")
+COMPASS_ROSE_PATH = Path(__file__).parent / Path("pictures/compass-rose.png")
 
 AIRCRAFT_TOP_PATH = Path(__file__).parent / Path("pictures/airplane-top-view.png")
 
