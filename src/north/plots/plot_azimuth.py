@@ -22,7 +22,7 @@ from pathlib import Path
 import base64
 import numpy as np
 import plotly.graph_objects as go
-from north.plots.graphics_utils import rotated_image_uri
+from north.plots.graphics_utils import rotated_image_uri, add_arrow
 from north.plots.theme import (
     BACKGROUND_COLOR,
     CARD_COLOR,
@@ -135,29 +135,7 @@ def azimuth_world_view(
     # NORTH ARROW
     # =====================================================
 
-    fig.add_annotation(
-        x=0,
-        y=1.0,
-        ax=0,
-        ay=0,
-
-        xref="x",
-        yref="y",
-        axref="x",
-        ayref="y",
-
-        showarrow=True,
-        arrowhead=3,
-        arrowsize=1.5,
-        arrowwidth=4,
-        arrowcolor=EARTH_ROTATION_COLOR,
-
-        text=EARTH_ROTATION_LABEL,
-        font=dict(
-            size=18,
-            color=EARTH_ROTATION_COLOR
-        )
-    )
+    add_arrow(fig, np.array([0.0, 1.0]), EARTH_ROTATION_LABEL, EARTH_ROTATION_COLOR)
 
     # =====================================================
     # HEADING VECTOR
@@ -168,26 +146,7 @@ def azimuth_world_view(
         np.cos(heading)
     ])
 
-    fig.add_annotation(
-        x=heading_vec[0],
-        y=heading_vec[1],
-
-        ax=0,
-        ay=0,
-
-        xref="x",
-        yref="y",
-        axref="x",
-        ayref="y",
-
-        showarrow=True,
-        arrowhead=3,
-        arrowsize=1.5,
-        arrowwidth=4,
-        arrowcolor=HIGHLIGHT_COLOR,
-
-        text="",
-    )
+    add_arrow(fig, heading_vec, r'\hat{X}', HIGHLIGHT_COLOR)
 
     # =====================================================
     # AZIMUTH ARC
