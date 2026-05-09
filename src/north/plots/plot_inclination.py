@@ -212,8 +212,8 @@ def inclination_3d_view(
             )
         ),
 
-        width=900,
-        height=700,
+        width=600,
+        height=600,
         showlegend=True
     )
 
@@ -510,8 +510,8 @@ def inclination_gauge(
 
         plot_bgcolor="black",
 
-        width=700,
-        height=700,
+        width=600,
+        height=600,
 
         margin=dict(
             l=20,

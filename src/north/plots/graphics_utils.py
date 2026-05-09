@@ -77,9 +77,9 @@ def add_arrow(
 
         The label may contain LaTeX expressions, for example:
 
-        - ``r"$\vec{g}$"``
-        - ``r"$\vec{\Omega}$"``
-        - ``r"$\hat{X}^b$"``
+        - ``r"\vec{g}"``
+        - ``r"\vec{\Omega}"``
+        - ``r"\hat{X}^b"``
 
         Plotly renders LaTeX using MathJax.
 
@@ -118,26 +118,7 @@ def add_arrow(
     end = start + vec
 
     # label positioning
-    text_loc = start + 1.1 * vec
-    text_pos = 'middle center'
-    if vec[0] == 0.0:
-        if vec[1] >= 0.0:
-            text_pos = "bottom center"
-        else:
-            text_pos = "top center"
-    elif vec[1] == 0.0:
-        if vec[0] == 0.0:
-            text_pos = "middle right"
-        else:
-            text_pos = "middle left"
-    elif vec[0] > 0 and vec[1] > 0:
-        text_pos = 'bottom right'
-    elif vec[0] < 0 < vec[1]:
-        text_pos = 'top left'
-    elif vec[0] < 0 and vec[1] < 0:
-        text_pos = 'bottom left'
-    elif vec[0] > 0 > vec[1]:
-        text_pos = 'bottom right'
+    text_loc = start + 1.15 * vec
 
     # =========================================================
     # ARROW
@@ -169,12 +150,12 @@ def add_arrow(
     # LABEL
     # =========================================================
 
-    fig.add_trace(go.Scatter(
-        x=[text_loc[0]],
-        y=[text_loc[1]],
-        mode="text",
-        text=[rf"${name}$" if "\\" in name else name],
-        textposition=text_pos,
-        textfont=dict(color=color, size=16),
-        showlegend=False,
-    ))
+    fig.add_annotation(
+        x=text_loc[0],
+        y=text_loc[1],
+        text=rf"${name}$" if "\\" in name else name,
+        showarrow=False,
+        font=dict(color=color, family="Noto Sans Math", size=16),
+        xanchor="center",
+        yanchor="middle",
+    )

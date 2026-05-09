@@ -259,8 +259,8 @@ def azimuth_world_view(
     fig.update_layout(
         title=f"Azimuth World View — Heading {azimuth_deg:.1f}°",
 
-        width=700,
-        height=700,
+        width=600,
+        height=600,
 
         plot_bgcolor=BACKGROUND_COLOR,
         paper_bgcolor=CARD_COLOR,
@@ -445,8 +445,8 @@ def azimuth_compass_view(
     fig.update_layout(
         title="Compass View",
 
-        width=700,
-        height=700,
+        width=600,
+        height=600,
 
         plot_bgcolor="black",
         paper_bgcolor=CARD_COLOR,

@@ -1,4 +1,4 @@
-"""
+r"""
 =====
 Theme
 =====
@@ -176,7 +176,7 @@ Using standard labels:
 # ============================================================
 
 GRAVITY_COLOR = "#d62728"
-"""
+r"""
 Canonical color for the Earth gravity vector.
 
 Represents:
@@ -192,7 +192,7 @@ The color red was chosen to emphasize:
 """
 
 EARTH_ROTATION_COLOR = "#1f77b4"
-"""
+r"""
 Canonical color for the Earth rotation vector.
 
 Represents:
@@ -235,12 +235,12 @@ Used to visualize:
 # LABELS
 # ============================================================
 
-GRAVITY_LABEL = r"\vec{g}"
+GRAVITY_LABEL = r'\vec{g}'
 """
 Canonical LaTeX label for the gravity vector.
 """
 
-EARTH_ROTATION_LABEL = r"\vec{\Omega}"
+EARTH_ROTATION_LABEL = r'\vec{\Omega}'
 """
 Canonical LaTeX label for the Earth rotation vector.
 """

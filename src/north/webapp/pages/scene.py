@@ -29,10 +29,12 @@ CARD_STYLE = {
     "padding": "20px",
     "backgroundColor": "#1a1a1a",
     "marginBottom": "25px",
+    "overflow": "hidden",
 }
 
 GRAPH_STYLE = {
-    "height": "500px",
+    "height": "600px",
+    "width": "100%",
 }
 
 
@@ -107,6 +109,8 @@ layout = html.Div(
                 dcc.Graph(
                     id="latitude-graph",
                     style=GRAPH_STYLE,
+                    mathjax=True,
+                    config={"responsive": True},
                 ),
 
             ],
@@ -149,7 +153,7 @@ layout = html.Div(
 
                     style={
                         "display": "grid",
-                        "gridTemplateColumns": "1fr 1fr",
+                        "gridTemplateColumns": "minmax(0, 1fr) minmax(0, 1fr)",
                         "gap": "20px",
                     },
 
@@ -158,11 +162,15 @@ layout = html.Div(
                         dcc.Graph(
                             id="azimuth-graph",
                             style=GRAPH_STYLE,
+                            mathjax=True,
+                            config={"responsive": True},
                         ),
 
                         dcc.Graph(
                             id="compass-graph",
                             style=GRAPH_STYLE,
+                            mathjax=True,
+                            config={"responsive": True},
                         ),
                     ],
                 ),
@@ -213,7 +221,7 @@ layout = html.Div(
 
                     style={
                         "display": "grid",
-                        "gridTemplateColumns": "1fr 1fr",
+                        "gridTemplateColumns": "minmax(0, 1fr) minmax(0, 1fr)",
                         "gap": "20px",
                     },
 
@@ -222,11 +230,15 @@ layout = html.Div(
                         dcc.Graph(
                             id="inclination-3d-graph",
                             style=GRAPH_STYLE,
+                            mathjax=True,
+                            config={"responsive": True},
                         ),
 
                         dcc.Graph(
                             id="inclination-gauge-graph",
                             style=GRAPH_STYLE,
+                            mathjax=True,
+                            config={"responsive": True},
                         ),
                     ],
                 ),

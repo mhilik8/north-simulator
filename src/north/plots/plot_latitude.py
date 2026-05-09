@@ -96,8 +96,8 @@ def latitude_view(latitude_deg: float):
         xaxis=dict(range=[-1.2, 1.2], zeroline=False),
         yaxis=dict(range=[-1.2, 1.2], zeroline=False),
         yaxis_scaleanchor="x",
-        width=700,
-        height=700
+        width=600,
+        height=600
     )
 
     return fig
