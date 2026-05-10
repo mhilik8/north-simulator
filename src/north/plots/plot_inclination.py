@@ -13,8 +13,8 @@ import numpy as np
 import plotly.graph_objects as go
 from functools import cache
 import trimesh
-from PIL import Image
 from north.plots.theme import *
+from north.plots.graphics_utils import add_arrow_3d
 
 
 model_path = Path(__file__).parent / Path("pictures/11803_Airplane_v1_l1/11803_Airplane_v1_l1.obj")
@@ -64,7 +64,7 @@ def load_aircraft_mesh(model_path: str = str(model_path)) -> trimesh.Trimesh:
     # =========================================================
 
     extent = vertices.max(axis=0) - vertices.min(axis=0)
-    scale = np.max(extent) / 2
+    scale = np.max(extent) * 0.6
 
     vertices = vertices / scale
 
@@ -96,10 +96,14 @@ def Ry(theta):
 def inclination_3d_view(
     pitch_deg: float,
     roll_deg: float,
+    azimuth_deg: float = 0.0,
+    show_body_frame: bool = True,
+    show_ground_frame: bool = True,
 ) -> go.Figure:
 
     pitch = np.deg2rad(pitch_deg)
     roll = np.deg2rad(roll_deg)
+    azimuth_deg = np.deg2rad(azimuth_deg)
 
     # =========================================================
     # LOAD AIRCRAFT MODEL
@@ -172,33 +176,37 @@ def inclination_3d_view(
         name="aircraft"
     ))
 
+    # unit vectors
+    x_hat = np.array([1, 0, 0])
+    y_hat = np.array([0, -1, 0])
+    z_hat = np.array([0, 0, -1])
+
     # =========================================================
     # GRAVITY VECTOR
     # =========================================================
 
-    fig.add_trace(go.Scatter3d(
-        x=[0, 0],
-        y=[0, 0],
-        z=[0, -1],
-        mode="lines",
-        line=dict(width=8, color=GRAVITY_COLOR),
-        name=GRAVITY_LABEL
-    ))
+    gravity_vec = z_hat
+    add_arrow_3d(fig, gravity_vec, GRAVITY_LABEL, GRAVITY_COLOR)
 
     # =========================================================
     # BODY Z AXIS
     # =========================================================
 
-    body_z = R @ np.array([0, 0, -1])
+    if show_body_frame:
+        body_x = R @ x_hat
+        body_y = R @ y_hat
+        body_z = R @ z_hat
 
-    fig.add_trace(go.Scatter3d(
-        x=[0, body_z[0]],
-        y=[0, body_z[1]],
-        z=[0, body_z[2]],
-        mode="lines",
-        line=dict(width=8),
-        name="body z"
-    ))
+        add_arrow_3d(fig, body_x, r"\hat{X}^b", 'black')
+        add_arrow_3d(fig, body_y, r"\hat{Y}^b", 'black')
+        add_arrow_3d(fig, body_z, r"\hat{Z}^b", 'black')
+
+    if azimuth_deg:
+        pass  # TODO: add the earth rotation vector and compass rode
+    else:
+        if show_ground_frame:
+            add_arrow_3d(fig, x_hat, r"\hat{X}^g", GRAVITY_COLOR)
+            add_arrow_3d(fig, y_hat, r"\hat{Y}^g", GRAVITY_COLOR)
 
     # =========================================================
     # LAYOUT
@@ -208,17 +216,9 @@ def inclination_3d_view(
         title=f"Pitch={pitch_deg:.1f}°, Roll={roll_deg:.1f}°",
         scene=dict(
             aspectmode="data",
-
-            xaxis=dict(
-                visible=False
-            ),
-            yaxis=dict(
-                visible=False
-            ),
-            zaxis=dict(
-                visible=False
-            ),
-
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            zaxis=dict(visible=False),
             camera=dict(
                 eye=dict(
                     x=1.5,
@@ -227,10 +227,8 @@ def inclination_3d_view(
                 )
             )
         ),
-
         width=600,
         height=600,
-        showlegend=True
     )
 
     return fig

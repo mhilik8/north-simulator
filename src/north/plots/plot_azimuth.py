@@ -30,6 +30,7 @@ from north.plots.theme import (
     EARTH_ROTATION_LABEL,
     HIGHLIGHT_COLOR,
     AIRCRAFT_SYMBOL_COLOR,
+    EARTH_COLOR
 )
 
 
@@ -221,7 +222,7 @@ def azimuth_world_view(
         width=600,
         height=600,
 
-        plot_bgcolor=BACKGROUND_COLOR,
+        plot_bgcolor=EARTH_COLOR,
         paper_bgcolor=CARD_COLOR,
 
         xaxis=dict(

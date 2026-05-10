@@ -16,23 +16,24 @@ from north.core.earth import earth_rotation_l, earth_gravity_l
 from north.plots.plot_latitude import latitude_view
 from north.plots.plot_azimuth import azimuth_compass_view, azimuth_world_view
 from north.plots.plot_inclination import inclination_3d_view, inclination_gauge
+from north.plots.plot_motor_plain import motor_plane_view
 
 # =========================================================
 # HELPERS
 # =========================================================
 
 def Rx(theta: float) -> SO3:
-    return SO3.exp(np.array([theta, 0.0, 0.0]))
+    return SO3.exp(np.array([-theta, 0.0, 0.0]))
 
 
 
 def Ry(theta: float) -> SO3:
-    return SO3.exp(np.array([0.0, theta, 0.0]))
+    return SO3.exp(np.array([0.0, -theta, 0.0]))
 
 
 
 def Rz(theta: float) -> SO3:
-    return SO3.exp(np.array([0.0, 0.0, theta]))
+    return SO3.exp(np.array([0.0, 0.0, -theta]))
 
 
 def register_scene_callbacks(app: Dash) -> None:
@@ -42,6 +43,7 @@ def register_scene_callbacks(app: Dash) -> None:
         Output("compass-graph", "figure"),
         Output("inclination-3d-graph", "figure"),
         Output("inclination-gauge-graph", "figure"),
+        Output("motor-plane-graph", "figure"),
         Output("measurement-text", "children"),
         Input("latitude-slider", "value"),
         Input("azimuth-slider", "value"),
@@ -73,16 +75,11 @@ def register_scene_callbacks(app: Dash) -> None:
         # =====================================================
 
         R_azimuth = Rz(state.azimuth)
-        R_pitch = Ry(-state.pitch)
+        R_pitch = Ry(state.pitch)
         R_roll = Rx(state.roll)
         R_encoder = Rz(state.encoder)
 
-        R_total = (
-                R_azimuth
-                * R_pitch
-                * R_roll
-                * R_encoder
-        )
+        R_total = R_encoder * R_roll * R_pitch *  R_azimuth
 
         # =====================================================
         # EARTH VECTORS
@@ -112,6 +109,8 @@ def register_scene_callbacks(app: Dash) -> None:
 
         gauge_fig = inclination_gauge(pitch_deg, roll_deg)
 
+        motor_fig = motor_plane_view(encoder_deg)
+
         # =====================================================
         # TEXT OUTPUT
         # =====================================================
@@ -124,20 +123,28 @@ def register_scene_callbacks(app: Dash) -> None:
     Pitch    : {pitch_deg:8.3f} deg
     Roll     : {roll_deg:8.3f} deg
     Encoder  : {encoder_deg:8.3f} deg
+    
+    Quaternions
+    -----------
+    
+    Azimuth     : {R_azimuth}
+    Pitch       : {R_pitch}
+    Roll        : {R_roll}
+    Encoder     : {R_encoder}
 
 
     Ideal Gravity Vector in Sensor Frame
     ------------------------------------
     [{gravity_sensor[0]: .6f},
      {gravity_sensor[1]: .6f},
-     {gravity_sensor[2]: .6f}]
+     {gravity_sensor[2]: .6f}] g
 
 
     Ideal Earth Rotation Vector in Sensor Frame
     -------------------------------------------
     [{omega_sensor[0]: .10f},
      {omega_sensor[1]: .10f},
-     {omega_sensor[2]: .10f}] rad/sec
+     {omega_sensor[2]: .10f}] deg/hour
     """
 
         return (
@@ -146,5 +153,6 @@ def register_scene_callbacks(app: Dash) -> None:
             compass_fig,
             inclination_3d_fig,
             gauge_fig,
+            motor_fig,
             text,
         )

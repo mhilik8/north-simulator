@@ -110,7 +110,7 @@ def earth_rotation_l(latitude: float) -> np.array:
     Returns
     -------
     np.ndarray of shape (3,)
-        Earth rotation vector expressed in the local-level-local-north NED frame.
+        Earth rotation vector expressed in the local-level-local-north NED frame [deg/hour].
 
     Notes
     -----
@@ -146,7 +146,7 @@ def earth_rotation_l(latitude: float) -> np.array:
 
     >>> earth_rotation_l(np.deg2rad(45))
     """
-    return EARTH_RATE * np.array([np.cos(latitude), 0, -np.sin(latitude)])
+    return EARTH_RATE_DEGREES_PER_HOUR * np.array([np.cos(latitude), 0, -np.sin(latitude)])
 
 
 def earth_gravity_l() -> np.array:

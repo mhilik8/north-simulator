@@ -252,8 +252,8 @@ class Quaternion:
 
         axis = phi / theta
         return cls(
-            np.cos(theta),
-            *(np.sin(theta) * axis),
+            np.cos(theta / 2),
+            *(np.sin(theta / 2) * axis),
             dtype=dtype,
         )
 

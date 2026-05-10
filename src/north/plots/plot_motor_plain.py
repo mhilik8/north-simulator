@@ -29,7 +29,7 @@ from north.plots.theme import *
 # COLORS
 # =========================================================
 
-SENSOR_COLOR = "#dddddd"
+SENSOR_COLOR = "blue"
 ENCODER_COLOR = "#ffcc00"
 NORTH_COLOR = EARTH_ROTATION_COLOR
 
@@ -65,10 +65,11 @@ def unit(angle_rad: float) -> np.ndarray:
 
 def motor_plane_view(
     encoder_deg: float,
-    azimuth_deg: float,
-    pitch_deg: float,
-    roll_deg: float,
-    latitude_deg: float,
+    azimuth_deg: float = 0.0,
+    pitch_deg: float = 0.0,
+    roll_deg: float = 0.0,
+    latitude_deg: float = 0.0,
+    show_earth_rotation_signal: bool = False,
 ) -> go.Figure:
     """
     Plot spinning motor plane geometry.
@@ -202,7 +203,7 @@ def motor_plane_view(
         [s,  c]
     ])
 
-    rect_rot = (R @ rect.T).T
+    rect_rot = rect @ R
 
     fig.add_trace(go.Scatter(
         x=rect_rot[:, 0],
@@ -221,100 +222,103 @@ def motor_plane_view(
     # TRUE NORTH PROJECTION
     # =====================================================
 
-    north_angle = azimuth
+    if azimuth_deg:
+        north_angle = azimuth
 
-    north_vec = unit(north_angle)
+        north_vec = unit(north_angle)
 
-    fig.add_annotation(
-        x=0.8 * north_vec[0],
-        y=0.8 * north_vec[1],
+        fig.add_annotation(
+            x=0.8 * north_vec[0],
+            y=0.8 * north_vec[1],
 
-        ax=0,
-        ay=0,
+            ax=0,
+            ay=0,
 
-        xref="x",
-        yref="y",
-        axref="x",
-        ayref="y",
+            xref="x",
+            yref="y",
+            axref="x",
+            ayref="y",
 
-        showarrow=True,
-        arrowhead=3,
-        arrowsize=1.5,
-        arrowwidth=4,
-        arrowcolor=NORTH_COLOR,
+            showarrow=True,
+            arrowhead=3,
+            arrowsize=1.5,
+            arrowwidth=4,
+            arrowcolor=NORTH_COLOR,
 
-        text=EARTH_ROTATION_LABEL,
+            text=EARTH_ROTATION_LABEL,
 
-        font=dict(
-            size=18,
-            color=NORTH_COLOR
+            font=dict(
+                size=18,
+                color=NORTH_COLOR
+            )
         )
-    )
 
     # =====================================================
     # GRAVITY PROJECTION
     # =====================================================
 
-    gravity_angle = azimuth + np.pi/2 + roll * 0.5
+    if pitch or roll:
+        gravity_angle = azimuth + np.pi/2 + roll * 0.5
 
-    gravity_vec = unit(gravity_angle)
+        gravity_vec = unit(gravity_angle)
 
-    fig.add_annotation(
-        x=0.7 * gravity_vec[0],
-        y=0.7 * gravity_vec[1],
+        fig.add_annotation(
+            x=0.7 * gravity_vec[0],
+            y=0.7 * gravity_vec[1],
 
-        ax=0,
-        ay=0,
+            ax=0,
+            ay=0,
 
-        xref="x",
-        yref="y",
-        axref="x",
-        ayref="y",
+            xref="x",
+            yref="y",
+            axref="x",
+            ayref="y",
 
-        showarrow=True,
-        arrowhead=3,
-        arrowsize=1.5,
-        arrowwidth=4,
-        arrowcolor=GRAVITY_PROJECTION_COLOR,
+            showarrow=True,
+            arrowhead=3,
+            arrowsize=1.5,
+            arrowwidth=4,
+            arrowcolor=GRAVITY_PROJECTION_COLOR,
 
-        text=GRAVITY_LABEL,
+            text=GRAVITY_LABEL,
 
-        font=dict(
-            size=18,
-            color=GRAVITY_PROJECTION_COLOR
+            font=dict(
+                size=18,
+                color=GRAVITY_PROJECTION_COLOR
+            )
         )
-    )
 
     # =====================================================
     # EARTH RATE SIGNAL
     # =====================================================
 
-    signal_theta = np.linspace(0, 2*np.pi, 2000)
+    if show_earth_rotation_signal:
+        signal_theta = np.linspace(0, 2*np.pi, 2000)
 
-    signal_amplitude = (
-        np.cos(signal_theta - north_angle)
-        * np.cos(latitude)
-        * np.cos(pitch)
-    )
+        signal_amplitude = (
+            np.cos(signal_theta - north_angle)
+            * np.cos(latitude)
+            * np.cos(pitch)
+        )
 
-    signal_r = 0.55 + 0.25 * signal_amplitude
+        signal_r = 0.55 + 0.25 * signal_amplitude
 
-    signal_x = signal_r * np.sin(signal_theta)
-    signal_y = signal_r * np.cos(signal_theta)
+        signal_x = signal_r * np.sin(signal_theta)
+        signal_y = signal_r * np.cos(signal_theta)
 
-    fig.add_trace(go.Scatter(
-        x=signal_x,
-        y=signal_y,
+        fig.add_trace(go.Scatter(
+            x=signal_x,
+            y=signal_y,
 
-        mode="lines",
+            mode="lines",
 
-        line=dict(
-            width=4,
-            color=SIGNAL_COLOR
-        ),
+            line=dict(
+                width=4,
+                color=SIGNAL_COLOR
+            ),
 
-        name="earth-rate signal"
-    ))
+            name="earth-rate signal"
+        ))
 
     # =====================================================
     # ENCODER ARC

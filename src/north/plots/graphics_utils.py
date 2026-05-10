@@ -14,6 +14,7 @@ import numpy as np
 
 
 ORIGIN = np.zeros(2)
+ORIGIN_3D = np.zeros(3)
 
 
 @cache
@@ -158,4 +159,153 @@ def add_arrow(
         font=dict(color=color, family="Noto Sans Math", size=18),
         xanchor="center",
         yanchor="middle",
+    )
+
+
+def add_arrow_3d(
+    fig: go.Figure,
+    vec: np.ndarray,
+    name: str,
+    color: str,
+    start: np.ndarray = ORIGIN_3D,
+    *,
+    shaft_width: float = 6,
+    head_scale: float = 0.18,
+    text_scale: float = 1.12,
+) -> None:
+    r"""
+    Add a labeled 3D vector arrow to a Plotly figure.
+
+    This utility is part of the North visual grammar system.
+
+    Visual Rules
+    ------------
+    * Physical vectors are always represented by arrows.
+    * Vector labels are attached near the arrow head.
+    * Labels may contain LaTeX math expressions.
+    * The arrow color and label color are always identical.
+    * The vector direction is encoded geometrically only,
+      never by text orientation.
+
+    Parameters
+    ----------
+    fig : go.Figure
+        Target Plotly figure.
+
+    vec : ndarray, shape (3,)
+        3D vector to draw.
+
+    name : str
+        Vector label.
+
+    color : str
+        Arrow and label color.
+
+    start : ndarray, shape (3,), optional
+        Arrow origin in plot coordinates.
+
+        Default is the global origin.
+
+    shaft_width : float, optional
+        Width of the arrow shaft.
+
+    head_scale : float, optional
+        Relative size of the arrow head.
+
+    text_scale : float, optional
+        Relative label offset from the vector tip.
+
+    Returns
+    -------
+    None
+        The figure is modified in-place.
+    """
+
+    vec = np.asarray(vec, dtype=float)
+    start = np.asarray(start, dtype=float)
+
+    end = start + vec
+
+    norm = np.linalg.norm(vec)
+
+    if norm == 0:
+        raise ValueError("Zero-length vector cannot be drawn as an arrow.")
+
+    # =========================================================
+    # LABEL POSITION
+    # =========================================================
+
+    text_loc = start + text_scale * vec
+
+    # =========================================================
+    # ARROW SHAFT
+    # =========================================================
+
+    # Leave room for cone head
+    cone_length = head_scale * norm
+    shaft_end = end - cone_length * vec / norm
+
+    fig.add_trace(
+        go.Scatter3d(
+            x=[start[0], shaft_end[0]],
+            y=[start[1], shaft_end[1]],
+            z=[start[2], shaft_end[2]],
+            mode="lines",
+            line=dict(
+                color=color,
+                width=shaft_width,
+            ),
+            showlegend=False,
+            hoverinfo="skip",
+        )
+    )
+
+    # =========================================================
+    # ARROW HEAD
+    # =========================================================
+
+    fig.add_trace(
+        go.Cone(
+            x=[shaft_end[0]],
+            y=[shaft_end[1]],
+            z=[shaft_end[2]],
+
+            u=[vec[0]],
+            v=[vec[1]],
+            w=[vec[2]],
+
+            sizemode="absolute",
+            sizeref=cone_length,
+
+            colorscale=[
+                [0, color],
+                [1, color],
+            ],
+
+            showscale=False,
+            hoverinfo="skip",
+        )
+    )
+
+    # =========================================================
+    # LABEL
+    # =========================================================
+
+    current_annotations = list(fig.layout.scene.annotations)
+
+    current_annotations.append(dict(
+                    showarrow=False,
+                    x=text_loc[0], y=text_loc[1], z=text_loc[2],
+                    text=rf"${name}$" if "\\" in name else name,
+                    font=dict(
+                        color=color,
+                        size=18,
+                        family="Noto Sans Math",
+                    ),
+                ))
+
+    fig.update_layout(
+        scene=dict(
+            annotations=current_annotations,
+        )
     )

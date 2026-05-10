@@ -270,13 +270,11 @@ layout = html.Div(
 
                 html.Br(),
 
-                html.Div(
-                    "Encoder / sensor-frame visualization coming soon...",
-                    style={
-                        "padding": "40px",
-                        "textAlign": "center",
-                        "opacity": 0.5,
-                    },
+                dcc.Graph(
+                    id="motor-plane-graph",
+                    style=GRAPH_STYLE,
+                    mathjax=True,
+                    config={"responsive": True},
                 ),
             ],
         ),
