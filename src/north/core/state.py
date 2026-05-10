@@ -233,6 +233,9 @@ class PhysicalState:
             "encoder": self.encoder
         }
 
+    def to_numpy(self) -> np.ndarray:
+        return np.copy(self._angles)
+
     @classmethod
     def from_floats(cls, latitude: float, azimuth: float, pitch: float, roll: float, encoder: float) -> PhysicalState:
         """

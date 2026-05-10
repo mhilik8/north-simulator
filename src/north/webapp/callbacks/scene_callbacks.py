@@ -11,12 +11,15 @@ all the callbacks for the webapp
 import numpy as np
 from dash import Dash, Output, Input
 from north.core.state import PhysicalState
+from north.core.scene import Scene
 from north.core.rotations import SO3
 from north.core.earth import earth_rotation_l, earth_gravity_l
 from north.plots.plot_latitude import latitude_view
 from north.plots.plot_azimuth import azimuth_compass_view, azimuth_world_view
 from north.plots.plot_inclination import inclination_3d_view, inclination_gauge
 from north.plots.plot_motor_plain import motor_plane_view
+from north.plots.scene import ScenePlotter
+
 
 # =========================================================
 # HELPERS
@@ -70,30 +73,7 @@ def register_scene_callbacks(app: Dash) -> None:
             np.deg2rad(encoder_deg),
         )
 
-        # =====================================================
-        # ROTATIONS
-        # =====================================================
-
-        R_azimuth = Rz(state.azimuth)
-        R_pitch = Ry(state.pitch)
-        R_roll = Rx(state.roll)
-        R_encoder = Rz(state.encoder)
-
-        R_total = R_encoder * R_roll * R_pitch *  R_azimuth
-
-        # =====================================================
-        # EARTH VECTORS
-        # =====================================================
-
-        gravity_l = earth_gravity_l()
-        omega_l = earth_rotation_l(state.latitude)
-
-        # =====================================================
-        # SENSOR FRAME VECTORS
-        # =====================================================
-
-        gravity_sensor = R_total.apply(gravity_l)
-        omega_sensor = R_total.apply(omega_l)
+        current_scene = ScenePlotter.from_physical_state(state)
 
         # =====================================================
         # FIGURES
@@ -115,6 +95,8 @@ def register_scene_callbacks(app: Dash) -> None:
         # TEXT OUTPUT
         # =====================================================
 
+        gravity_sensor, omega_sensor = current_scene.vectors()
+
         text = f"""
     Physical State
     --------------
@@ -123,14 +105,6 @@ def register_scene_callbacks(app: Dash) -> None:
     Pitch    : {pitch_deg:8.3f} deg
     Roll     : {roll_deg:8.3f} deg
     Encoder  : {encoder_deg:8.3f} deg
-    
-    Quaternions
-    -----------
-    
-    Azimuth     : {R_azimuth}
-    Pitch       : {R_pitch}
-    Roll        : {R_roll}
-    Encoder     : {R_encoder}
 
 
     Ideal Gravity Vector in Sensor Frame
