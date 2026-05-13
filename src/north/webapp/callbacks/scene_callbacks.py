@@ -8,35 +8,12 @@ callbacks
 all the callbacks for the webapp
 """
 
-import numpy as np
 from dash import Dash, Output, Input
-from north.core.state import PhysicalState
-from north.core.scene import Scene
-from north.core.rotations import SO3
-from north.core.earth import earth_rotation_l, earth_gravity_l
 from north.plots.plot_latitude import latitude_view
 from north.plots.plot_azimuth import azimuth_compass_view, azimuth_world_view
-from north.plots.plot_inclination import inclination_3d_view, inclination_gauge
+from north.plots.plot_inclination import inclination_3d_view, inclination_gauge_view
 from north.plots.plot_motor_plain import motor_plane_view
 from north.plots.scene import ScenePlotter
-
-
-# =========================================================
-# HELPERS
-# =========================================================
-
-def Rx(theta: float) -> SO3:
-    return SO3.exp(np.array([-theta, 0.0, 0.0]))
-
-
-
-def Ry(theta: float) -> SO3:
-    return SO3.exp(np.array([0.0, -theta, 0.0]))
-
-
-
-def Rz(theta: float) -> SO3:
-    return SO3.exp(np.array([0.0, 0.0, -theta]))
 
 
 def register_scene_callbacks(app: Dash) -> None:
@@ -65,30 +42,30 @@ def register_scene_callbacks(app: Dash) -> None:
         # PHYSICAL STATE
         # =====================================================
 
-        state = PhysicalState.from_floats(
-            np.deg2rad(latitude_deg),
-            np.deg2rad(azimuth_deg),
-            np.deg2rad(pitch_deg),
-            np.deg2rad(roll_deg),
-            np.deg2rad(encoder_deg),
+        current_scene = ScenePlotter.from_physical_state(
+            latitude_deg,
+            azimuth_deg,
+            pitch_deg,
+            roll_deg,
+            encoder_deg
         )
-
-        current_scene = ScenePlotter.from_physical_state(state)
 
         # =====================================================
         # FIGURES
         # =====================================================
 
+        #latitude (e -> l)
         latitude_fig = latitude_view(latitude_deg)
 
+        # azimuth (l -> g)
         azimuth_fig = azimuth_world_view(azimuth_deg)
-
         compass_fig = azimuth_compass_view(azimuth_deg)
 
+        # inclination (g -> b, include o as sub transformation)
         inclination_3d_fig = inclination_3d_view(pitch_deg, roll_deg)
+        gauge_fig = inclination_gauge_view(pitch_deg, roll_deg)
 
-        gauge_fig = inclination_gauge(pitch_deg, roll_deg)
-
+        # motor plane
         motor_fig = motor_plane_view(encoder_deg)
 
         # =====================================================

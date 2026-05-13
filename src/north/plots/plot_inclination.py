@@ -234,7 +234,7 @@ def inclination_3d_view(
     return fig
 
 
-def inclination_gauge(
+def inclination_gauge_view(
     pitch_deg: float,
     roll_deg: float
 ) -> go.Figure:
