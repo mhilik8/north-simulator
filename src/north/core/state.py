@@ -144,6 +144,7 @@ Converting to a dictionary:
 >>> state.to_dict()
 """
 
+from __future__ import annotations
 from dataclasses import dataclass
 import numpy as np
 

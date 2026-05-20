@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "north"
 description = "a package for north simulation"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 readme = "README.rst"
 keywords = [
     "gyro",
@@ -28,6 +28,10 @@ license = {file = "LICENSE"}
 dynamic = ["version"]
 dependencies = [
     "numpy>=2.4.4",
+    "dash",
+    "plotly",
+    "trimesh",
+    "pillow"
 ]
 
 [project.urls]

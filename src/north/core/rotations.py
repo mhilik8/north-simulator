@@ -1,4 +1,4 @@
-"""
+r"""
 =========
 Rotations
 =========
@@ -74,6 +74,7 @@ Quaternion provides the numerical representation, while SO3 provides
 semantic group structure and frame-aware operations.
 """
 
+from __future__ import annotations
 from dataclasses import dataclass
 from north.core.quaternions import Quaternion
 import numpy as np
