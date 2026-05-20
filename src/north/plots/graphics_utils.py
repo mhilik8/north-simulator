@@ -5,6 +5,9 @@ graphics utils
 
 :Author: Reuven Mol
 """
+
+import os
+from pathlib import Path
 import plotly.graph_objects as go
 from functools import cache
 from PIL import Image
@@ -12,13 +15,21 @@ import io
 import base64
 import numpy as np
 
+PICTURES_PATH: Path = Path(__file__).parent / Path("pictures")
 
 ORIGIN = np.zeros(2)
 ORIGIN_3D = np.zeros(3)
 
 
+def pictures() -> list[str]:
+    return [p for p in os.listdir(PICTURES_PATH) if p.endswith(".png") or p.endswith(".jpg")]
+
+
 @cache
-def load_image(path: str) -> Image.Image:
+def load_image(name: str) -> Image.Image:
+    if name not in pictures():
+        raise KeyError(f'{name} is not found in pictures folder')
+    path = PICTURES_PATH / name
     return Image.open(path).convert("RGBA")
 
 
@@ -50,7 +61,7 @@ def add_arrow(
         name: str,
         color: str,
         start: np.ndarray = ORIGIN,
-) -> None:
+) -> tuple:
     r"""
     Add a labeled 2D vector arrow to a Plotly figure.
 
@@ -96,29 +107,34 @@ def add_arrow(
 
     Returns
     -------
-    None
-        The figure is modified in-place.
+    tuple
+        Tuple containing:
+
+        - arrow annotation handle
+        - label annotation handle
+
+        Both objects can later be modified in-place for
+        efficient plot updates.
 
     Examples
     --------
-    >>> add_arrow(
+    >>> arrow, label = add_arrow(
     ...     fig,
     ...     vec=np.array([0, 1]),
     ...     name=r"\vec{\Omega}",
     ...     color="blue"
     ... )
 
-    >>> add_arrow(
-    ...     fig,
-    ...     vec=np.array([1, 0]),
-    ...     name=r"\hat{X}^b",
-    ...     color="black"
-    ... )
+    >>> arrow.x = 1.0
+    >>> label.text = r"$\vec{g}$"
     """
 
     end = start + vec
 
-    # label positioning
+    # =========================================================
+    # LABEL POSITION
+    # =========================================================
+
     text_loc = start + 1.12 * vec
 
     # =========================================================
@@ -147,6 +163,8 @@ def add_arrow(
         text="",
     )
 
+    arrow_annotation = fig.layout.annotations[-1]
+
     # =========================================================
     # LABEL
     # =========================================================
@@ -154,12 +172,24 @@ def add_arrow(
     fig.add_annotation(
         x=text_loc[0],
         y=text_loc[1],
+
         text=rf"${name}$" if "\\" in name else name,
+
         showarrow=False,
-        font=dict(color=color, family="Noto Sans Math", size=18),
+
+        font=dict(
+            color=color,
+            family="Noto Sans Math",
+            size=18
+        ),
+
         xanchor="center",
         yanchor="middle",
     )
+
+    label_annotation = fig.layout.annotations[-1]
+
+    return arrow_annotation, label_annotation
 
 
 def add_arrow_3d(
