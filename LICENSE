@@ -1,0 +1,154 @@
+# North Educational Navigation License (Draft)
+
+Copyright (c) 2026 Reuven Mol
+
+## 1. Purpose
+
+This software and associated documentation (the "Software") are provided solely for:
+
+* educational use
+* academic research
+* personal learning
+* non-commercial experimentation
+
+The Software is intended to support the study of:
+
+* navigation systems
+* inertial sensing
+* SO(3) rotations
+* quaternions
+* gyrocompassing
+* sensor modeling
+* engineering visualization
+
+---
+
+## 2. Permission Grant
+
+Permission is hereby granted, free of charge, to any individual or academic institution to use, copy, modify, and
+distribute the Software for non-commercial educational or research purposes, subject to the conditions of this license.
+
+Redistribution of modified versions must include:
+
+* this license text
+* attribution to the original author
+* a clear notice describing modifications
+
+Suggested attribution:
+
+> "Based on the North educational navigation project by Reuven Mol."
+
+---
+
+## 3. Commercial Use Restriction
+
+Commercial use of the Software is strictly prohibited without prior written permission from the author.
+
+Commercial use includes, but is not limited to:
+
+* incorporation into commercial products
+* paid consulting services
+* commercial training
+* internal company tooling
+* SaaS platforms
+* proprietary simulation systems
+* commercial navigation systems
+
+---
+
+## 4. Restricted Use
+
+The Software may NOT be used, directly or indirectly, for:
+
+* military applications
+* defense systems
+* weapons systems
+* intelligence operations
+* surveillance systems
+* autonomous weapons
+* targeting systems
+* operational navigation systems
+* safety-critical systems
+* export-controlled systems
+* unlawful activities
+* harmful activities
+
+Government or contractor usage related to any of the above categories shall be considered prohibited commercial use.
+
+This Software is intended strictly for educational and research purposes.
+
+---
+
+## 5. No Certification
+
+The Software is NOT certified for:
+
+* aviation
+* marine navigation
+* autonomous vehicles
+* industrial safety systems
+* operational deployment
+* mission-critical applications
+
+The Software must not be relied upon for real-world navigation or safety-critical decision making.
+
+---
+
+## 6. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
+
+* MERCHANTABILITY
+* FITNESS FOR A PARTICULAR PURPOSE
+* NON-INFRINGEMENT
+* ACCURACY
+* RELIABILITY
+* SAFETY
+
+The entire risk arising from use of the Software remains with the user.
+
+---
+
+## 7. Limitation of Liability
+
+IN NO EVENT SHALL THE AUTHOR OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM:
+
+* use of the Software
+* misuse of the Software
+* inability to use the Software
+* errors in the Software
+* inaccuracies in the Software
+* downstream consequences of the Software
+
+This limitation applies even if the author has been advised of the possibility of such damages.
+
+---
+
+## 8. Responsibility of the User
+
+Users are solely responsible for ensuring compliance with:
+
+* local laws
+* export regulations
+* safety regulations
+* ethical standards
+* institutional policies
+
+The author assumes no responsibility for user actions or downstream usage.
+
+---
+
+## 9. Termination
+
+Any violation of this license automatically terminates the rights granted under this license.
+
+Upon termination, the user must cease all use and distribution of the Software.
+
+---
+
+## 10. Contact
+
+Commercial licensing inquiries may be directed to the author.
+
+All other usage requests should comply with the terms of this license.

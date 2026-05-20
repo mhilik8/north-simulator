@@ -10,9 +10,6 @@ venv/
 # Egg file
 src/north.egg-info
 
-# license
-LICENSE
-
 # Node artifact files
 node_modules/
 dist/
