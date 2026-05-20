@@ -13,9 +13,6 @@ import numpy as np
 
 ArrayLike = Union[np.ndarray, list, tuple]
 
-AZIMUTH_2AXIS = 244.2375
-"""the azimuth of the 2Axis station"""
-
 
 class EulerAngles(NamedTuple):
     roll: np.float64

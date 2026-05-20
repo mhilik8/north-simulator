@@ -9,15 +9,16 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "north"
 description = "a package for north simulation"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 readme = "README.rst"
 keywords = [
-    'Condor Pacific LTD',
+    "gyro",
+    "commpasing",
     "north",
     "simulation"
 ]
 authors = [
-    { name="Reuven Mol", email="reuven@condorpacific.co.il" },
+    { name="Reuven Mol", email="reuven.mol@mail.huji.ac.il" },
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -30,7 +31,7 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://bitbucket.org/Yosibuc/north-simulation"
+"Homepage" = "https://github.com/mhilik8/north-simulator"
 
 [project.optional-dependencies]
 tests = [

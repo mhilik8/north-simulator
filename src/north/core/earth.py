@@ -62,6 +62,8 @@ https://hpiers.obspm.fr/eop-pc/models/constants.html
 
 import numpy as np
 
+JERUSALEM_LATITUDE = 31.7982  # [deg]
+
 EARTH_RATE_DEGREES_PER_HOUR = 15.04106687606545  # [deg/hour] from https://hpiers.obspm.fr/eop-pc/models/constants.html
 """
 Earth rotation rate in degrees per hour.

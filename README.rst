@@ -47,4 +47,4 @@ Who do I talk to?
 
 * `Reuven Mol`_
 
-.. _Reuven Mol: reuven@condorpacific.co.il
+.. _Reuven Mol: reuven.mol@mail.huji.ac.il
