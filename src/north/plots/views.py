@@ -12,7 +12,8 @@ from abc import ABC, abstractmethod
 
 from north.core.quaternions import Quaternion
 from north.plots.graphics_utils import (
-    load_image, add_arrow, rotated_image_uri, add_arrow_3d, load_aircraft_mesh)
+    load_image, rotated_image_uri, add_arrow_3d, load_aircraft_mesh)
+from north.plots.primitives import Arrow, Arc
 from north.plots.theme import (
     GRAVITY_COLOR, EARTH_ROTATION_COLOR,
     GRAVITY_LABEL, EARTH_ROTATION_LABEL,
@@ -74,20 +75,22 @@ class LatitudeView(View):
             )
         )
 
-        self.gravity_arrow, self.gravity_label = add_arrow(
+        # gravity
+        self.gravity_arrow = Arrow.add_arrow(
             self.figure,
-            vec=g,
-            name=GRAVITY_LABEL,
+            vector=g,
+            label=GRAVITY_LABEL,
             color=GRAVITY_COLOR,
-            start=p
+            origin=p
         )
 
-        self.rotation_arrow, self.rotation_label = add_arrow(
+        # earth rotation
+        self.rotation_arrow = Arrow.add_arrow(
             self.figure,
-            vec=omega,
-            name=EARTH_ROTATION_LABEL,
+            vector=omega,
+            label=EARTH_ROTATION_LABEL,
             color=EARTH_ROTATION_COLOR,
-            start=p
+            origin=p
         )
 
         t0 = p + self.tangent * 0.4
@@ -119,21 +122,12 @@ class LatitudeView(View):
 
     def update(self, p, g, omega, latitude) -> None:
         self.p = p
+
         # gravity
-        self.gravity_arrow.x = p[0] + 0.4 * g[0]
-        self.gravity_arrow.y = p[1] + 0.4 * g[1]
-        self.gravity_arrow.ax = p[0]
-        self.gravity_arrow.ay = p[1]
-        self.gravity_label.x = p[0] + 1.12 * g[0]
-        self.gravity_label.y = p[1] + 1.12 * g[1]
+        self.gravity_arrow.update(g, p)
 
         # earth rotation axis projected in this plane (visual only)
-        self.rotation_arrow.x = p[0] + 0.4 * omega[0]
-        self.rotation_arrow.y = p[1] + 0.4 * omega[1]
-        self.rotation_arrow.ax = p[0]
-        self.rotation_arrow.ay = p[1]
-        self.rotation_label.x = p[0] + 1.12 * omega[0]
-        self.rotation_label.y = p[1] + 1.12 * omega[1]
+        self.rotation_arrow.update(omega, p)
 
         t0 = p + self.tangent * 0.4
         t1 = p - self.tangent * 0.4
@@ -192,7 +186,7 @@ class AzimuthView(View):
         self.rotated_aircraft = self.figure.layout.images[-1]
 
         north_vector_l = np.array([0.0, 1.0])  # this should move to scene plotter
-        self.north_arrow, self.north_label = add_arrow(
+        self.north_arrow = Arrow.add_arrow(
             self.figure,
             north_vector_l,
             EARTH_ROTATION_LABEL,
@@ -209,7 +203,7 @@ class AzimuthView(View):
             np.cos(heading)
         ])  # this should move to scene plotter
 
-        self.heading_arrow, self.heading_label = add_arrow(
+        self.heading_arrow = Arrow.add_arrow(
             self.figure,
             heading_vec,
             r'\hat{X}',
@@ -220,43 +214,14 @@ class AzimuthView(View):
         # AZIMUTH ARC
         # =====================================================
 
-        arc_angles = np.linspace(0, heading, 150)
-        arc_x = 0.55 * np.sin(arc_angles)
-        arc_y = 0.55 * np.cos(arc_angles)
+        self.azimuth_arc = Arc.add_arc(
+            self.figure,
+            end=heading,
+            label=f"{self.azimuth:.1f}°",
+            color=HIGHLIGHT_COLOR
+        )
 
-        self.figure.add_trace(go.Scatter(
-            x=arc_x,
-            y=arc_y,
-            mode="lines",
-            line=dict(width=4, color=HIGHLIGHT_COLOR),
-            showlegend=False
-        ))
-
-        self.azimuth_arc = self.figure.data[-1]
-
-        # =====================================================
-        # HEADING LABEL
-        # =====================================================
-
-        mid_angle = heading / 2
-        arc_label_x = 0.68 * np.sin(mid_angle)
-        arc_label_y = 0.68 * np.cos(mid_angle)
-        # TODO: change this to annotations instead of scatter
-        self.figure.add_trace(go.Scatter(
-            x=arc_label_x,
-            y=arc_label_y,
-            mode="text",
-            text=[f"{self.azimuth:.1f}°"],
-            textfont=dict(size=16, color=HIGHLIGHT_COLOR),
-            showlegend=False
-        ))
-
-        self.azimuth_arc_label = self.figure.data[-1]
-
-        # =====================================================
         # CENTER POINT
-        # =====================================================
-
         self.figure.add_trace(go.Scatter(
             x=[0],
             y=[0],
@@ -265,10 +230,7 @@ class AzimuthView(View):
             showlegend=False
         ))
 
-        # =====================================================
         # LAYOUT
-        # =====================================================
-
         self.figure.update_layout(
             title=f"Azimuth World View — Heading {self.azimuth:.1f}°",
             width=600,
@@ -283,41 +245,27 @@ class AzimuthView(View):
     def update(self, new_azimuth) -> None:
         self.azimuth = new_azimuth
 
-        # aircraft picture
+        # update aircraft picture
         rotated_aircraft = rotated_image_uri(str(AIRCRAFT_TOP_PATH), -self.azimuth)
         self.rotated_aircraft.source = rotated_aircraft
 
-        # north vector
+        # update north vector
         north_vector_l = np.array([0.0, 1.0])  # this should move to scene plotter
-        self.north_arrow.x = north_vector_l[0]
-        self.north_arrow.y = north_vector_l[1]
-        self.north_label.a = north_vector_l[0]
-        self.north_label.y = north_vector_l[1]
+        self.north_arrow.update(north_vector_l)
 
-        # heading vector
+        # update heading vector
         heading = np.deg2rad(self.azimuth)
         heading_vec = np.array([
             np.sin(heading),
             np.cos(heading)
         ])  # this should move to scene plotter
-        self.heading_arrow.x = heading_vec[0]
-        self.heading_arrow.y = heading_vec[1]
-        self.heading_label.x = heading_vec[0]
-        self.heading_label.y = heading_vec[1]
+        self.heading_arrow.update(heading_vec)
 
-        # azimuth arc
-        arc_angles = np.linspace(0, heading, 150)
-        arc_x = 0.55 * np.sin(arc_angles)
-        arc_y = 0.55 * np.cos(arc_angles)
-        self.azimuth_arc.x = arc_x
-        self.azimuth_arc.y = arc_y
-
-        # arc label
-        mid_angle = heading / 2
-        arc_label_x = 0.68 * np.sin(mid_angle)
-        arc_label_y = 0.68 * np.cos(mid_angle)
-        self.azimuth_arc_label.x = arc_label_x
-        self.azimuth_arc_label.y = arc_label_y
+        # update azimuth arc
+        self.azimuth_arc.update(
+            new_start=heading_vec,
+            new_label=f"{self.azimuth:.1f}°"
+        )
 
 
 class CompassView(View):
