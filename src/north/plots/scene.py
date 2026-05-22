@@ -34,8 +34,6 @@ class ScenePlotter:
 
     def __init__(self, scene: Scene):
         self.scene = scene
-        self.latitude_view = go.Figure()
-        self.latitude_metadata = PlotMetadata(FrameOfReference.l, "Y:X,X:-Z")
 
         # initiate latitude plots
         p = np.array([
@@ -47,9 +45,11 @@ class ScenePlotter:
         # according to "Y:X,X:-Z" mapping
         g = np.array([-g[2], g[0]])
         omega = np.array([-omega[2], omega[0]])
+        self.latitude_metadata = PlotMetadata(FrameOfReference.l, "Y:X,X:-Z")
         self.latitude_view = LatitudeView(p, g, omega, np.rad2deg(self.scene.physical_state.latitude))
 
     def update(self):
+        # calculate the required arguments for latitude view
         p = np.array([
             np.cos(self.scene.physical_state.latitude),
             np.sin(self.scene.physical_state.latitude)

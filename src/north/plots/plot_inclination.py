@@ -8,67 +8,10 @@ Plot inclination
 Graphical visualization for inclination
 """
 
-from pathlib import Path
 import numpy as np
 import plotly.graph_objects as go
-from functools import cache
-import trimesh
 from north.plots.theme import *
-from north.plots.graphics_utils import add_arrow_3d
-
-
-model_path = Path(__file__).parent / Path("pictures/11803_Airplane_v1_l1/11803_Airplane_v1_l1.obj")
-"""
-a 3D model of an Aircraft
-
-toked from here:
-https://free3d.com/3d-model/airplane-v1--79106.html
-"""
-
-def uv_to_colors(uv, texture):
-    img = np.array(texture) / 255.0
-    h, w = img.shape[:2]
-
-    u = (uv[:, 0] * (w - 1)).astype(int)
-    v = ((1 - uv[:, 1]) * (h - 1)).astype(int)
-
-    colors = img[v, u]
-    return colors
-
-@cache
-def load_aircraft_mesh(model_path: str = str(model_path)) -> trimesh.Trimesh:
-
-    mesh_or_scene = trimesh.load(model_path)
-
-    if isinstance(mesh_or_scene, trimesh.Scene):
-        mesh = trimesh.util.concatenate(tuple(geometry for geometry in mesh_or_scene.geometry.values()))
-    else:
-        mesh = mesh_or_scene
-
-    uv = mesh.visual.uv
-    texture = mesh.visual.material.image
-
-    vertices = np.array(mesh.vertices)
-    faces = np.array(mesh.faces)
-    colors = uv_to_colors(uv, texture)
-
-    # =========================================================
-    # CENTER MODEL
-    # =========================================================
-
-    center = vertices.mean(axis=0)
-    vertices = vertices - center
-
-    # =========================================================
-    # NORMALIZE MODEL SIZE
-    # =========================================================
-
-    extent = vertices.max(axis=0) - vertices.min(axis=0)
-    scale = np.max(extent) * 0.6
-
-    vertices = vertices / scale
-
-    return vertices, faces, colors
+from north.plots.graphics_utils import add_arrow_3d, load_aircraft_mesh
 
 
 def Rx(theta):

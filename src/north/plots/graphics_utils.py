@@ -8,14 +8,23 @@ graphics utils
 
 import os
 from pathlib import Path
-import plotly.graph_objects as go
 from functools import cache
-from PIL import Image
 import io
 import base64
+import trimesh
+import plotly.graph_objects as go
+from PIL import Image
 import numpy as np
 
 PICTURES_PATH: Path = Path(__file__).parent / Path("pictures")
+
+MODEL_PATH: Path = PICTURES_PATH / Path("11803_Airplane_v1_l1/11803_Airplane_v1_l1.obj")
+"""
+a 3D model of an Aircraft
+
+toked from here:
+https://free3d.com/3d-model/airplane-v1--79106.html
+"""
 
 ORIGIN = np.zeros(2)
 ORIGIN_3D = np.zeros(3)
@@ -53,6 +62,53 @@ def rotated_image_uri(path: str, angle_deg: float) -> str:
     encoded = base64.b64encode(buffer.getvalue()).decode()
 
     return f"data:image/png;base64,{encoded}"
+
+
+def uv_to_colors(uv, texture):
+    img = np.array(texture) / 255.0
+    h, w = img.shape[:2]
+
+    u = (uv[:, 0] * (w - 1)).astype(int)
+    v = ((1 - uv[:, 1]) * (h - 1)).astype(int)
+
+    colors = img[v, u]
+    return colors
+
+
+@cache
+def load_aircraft_mesh(model_path: str = str(MODEL_PATH)) -> trimesh.Trimesh:
+
+    mesh_or_scene = trimesh.load(model_path)
+
+    if isinstance(mesh_or_scene, trimesh.Scene):
+        mesh = trimesh.util.concatenate(tuple(geometry for geometry in mesh_or_scene.geometry.values()))
+    else:
+        mesh = mesh_or_scene
+
+    uv = mesh.visual.uv
+    texture = mesh.visual.material.image
+
+    vertices = np.array(mesh.vertices)
+    faces = np.array(mesh.faces)
+    colors = uv_to_colors(uv, texture)
+
+    # =========================================================
+    # CENTER MODEL
+    # =========================================================
+
+    center = vertices.mean(axis=0)
+    vertices = vertices - center
+
+    # =========================================================
+    # NORMALIZE MODEL SIZE
+    # =========================================================
+
+    extent = vertices.max(axis=0) - vertices.min(axis=0)
+    scale = np.max(extent) * 0.6
+
+    vertices = vertices / scale
+
+    return vertices, faces, colors
 
 
 def add_arrow(

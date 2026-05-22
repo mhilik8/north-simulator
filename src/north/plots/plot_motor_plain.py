@@ -294,29 +294,23 @@ def motor_plane_view(
 
     if show_earth_rotation_signal:
         signal_theta = np.linspace(0, 2*np.pi, 2000)
-
         signal_amplitude = (
             np.cos(signal_theta - north_angle)
             * np.cos(latitude)
             * np.cos(pitch)
         )
-
         signal_r = 0.55 + 0.25 * signal_amplitude
-
         signal_x = signal_r * np.sin(signal_theta)
         signal_y = signal_r * np.cos(signal_theta)
 
         fig.add_trace(go.Scatter(
             x=signal_x,
             y=signal_y,
-
             mode="lines",
-
             line=dict(
                 width=4,
                 color=SIGNAL_COLOR
             ),
-
             name="earth-rate signal"
         ))
 

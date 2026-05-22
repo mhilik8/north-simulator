@@ -275,3 +275,9 @@ Highlight color for:
 
 SKY_COLOR = "rgb(110,140,180)"  # used by inclination gauge
 EARTH_COLOR = "rgb(120,90,70)"  # used by inclination gauge
+
+ZERO_ENCODER_COLOR = "#ffffff"
+
+SENSOR_COLOR = "blue"
+
+ENCODER_COLOR = "#ffcc00"
