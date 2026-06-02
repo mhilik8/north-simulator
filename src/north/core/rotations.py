@@ -139,7 +139,7 @@ class SO3:
 
     @classmethod
     def exp(cls, v: np.ndarray) -> SO3:
-        """
+        r"""
         Exponential map from so(3) to SO(3).
 
         Parameters
@@ -163,7 +163,7 @@ class SO3:
         return cls(Quaternion.exp(v))
 
     def log(self) -> np.ndarray:
-        """
+        r"""
         Logarithmic map from SO(3) to so(3).
 
         Returns

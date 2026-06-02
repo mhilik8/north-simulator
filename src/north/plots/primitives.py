@@ -14,12 +14,16 @@ import plotly.graph_objects as go
 
 
 class Primitive(ABC):
+
+    def __init__(self, name_id, *arg, **kwarg):
+        self.name_id: str = name_id
+
     @abstractmethod
-    def update(self, *args, **kwargs) -> None:
+    def update(self, fig: go.Figure, *args, **kwargs) -> None:
         pass
 
     @abstractmethod
-    def draw(self, fig) -> None:
+    def draw(self, fig: go.Figure) -> None:
         pass
 
 
@@ -35,15 +39,14 @@ class Arrow(Primitive2d):
 
     DEFAULT_ORIGIN = np.array([0, 0])
 
-    def __init__(self, vector, label, color, origin=None):
+    def __init__(self, name_id, vector, label, color, origin=None, *args, **kwargs):
+        super().__init__(name_id, *args, **kwargs)
         if origin is None:
             origin = self.DEFAULT_ORIGIN.copy()
         self.origin = origin
         self.vector = vector
         self.label = label
         self.color = color
-        self.plotly_arrow = None
-        self.plotly_label = None
 
     @property
     def endpoint(self):
@@ -54,12 +57,21 @@ class Arrow(Primitive2d):
         return self.origin + 1.12 * self.vector
 
     @property
-    def label_text(self):
+    def label_text(self) -> str:
         return rf"${self.label}$" if "\\" in self.label else self.label
 
-    def draw(self, fig) -> None:
+    @property
+    def arrow_name_id(self) -> str:
+        return f'{self.name_id}_arrow'
+
+    @property
+    def label_name_id(self) -> str:
+        return f'{self.name_id}_label'
+
+    def draw(self, fig: go.Figure) -> None:
         # arrow
         fig.add_annotation(
+            name=self.arrow_name_id,
             x=self.endpoint[0],
             y=self.endpoint[1],
             ax=self.origin[0],
@@ -75,10 +87,10 @@ class Arrow(Primitive2d):
             arrowcolor=self.color,
             text="",
         )
-        self.plotly_arrow = fig.layout.annotations[-1]
 
         # label
         fig.add_annotation(
+            name=self.label_name_id,
             x=self.text_location[0],
             y=self.text_location[1],
             text=self.label_text,
@@ -87,24 +99,31 @@ class Arrow(Primitive2d):
             xanchor="center",
             yanchor="middle",
         )
-        self.plotly_label = fig.layout.annotations[-1]
 
-    def update(self, new_vector = None, new_origin = None) -> None:
+    def update(self, fig: go.Figure, new_vector = None, new_origin = None) -> None:
         if new_vector is not None:
             self.vector = new_vector
         if new_origin is not None:
             self.origin = new_origin
+
         # redraw later
-        self.plotly_arrow.x = self.endpoint[0]
-        self.plotly_arrow.y = self.endpoint[1]
-        self.plotly_arrow.ax = self.origin[0]
-        self.plotly_arrow.ay = self.origin[1]
-        self.plotly_label.x = self.text_location[0]
-        self.plotly_label.y = self.text_location[1]
+        fig.update_annotations(
+            selector=dict(name=self.arrow_name_id),
+            x = self.endpoint[0],
+            y = self.endpoint[1],
+            ax = self.origin[0],
+            ay = self.origin[1],
+        )
+
+        fig.update_annotations(
+            selector=dict(name=self.label_name_id),
+            x = self.text_location[0],
+            y = self.text_location[1],
+        )
 
     @classmethod
-    def add_arrow(cls, fig, vector, label, color, origin=None) -> Arrow:
-        new_arrow = cls(vector, label, color, origin)
+    def add_arrow(cls, fig: go.Figure, name, vector, label, color, origin=None) -> Arrow:
+        new_arrow = cls(name, vector, label, color, origin)
         new_arrow.draw(fig)
         return new_arrow
 

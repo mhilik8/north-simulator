@@ -78,6 +78,7 @@ class LatitudeView(View):
         # gravity
         self.gravity_arrow = Arrow.add_arrow(
             self.figure,
+            'gravity',
             vector=g,
             label=GRAVITY_LABEL,
             color=GRAVITY_COLOR,
@@ -87,6 +88,7 @@ class LatitudeView(View):
         # earth rotation
         self.rotation_arrow = Arrow.add_arrow(
             self.figure,
+            'earth_rotation',
             vector=omega,
             label=EARTH_ROTATION_LABEL,
             color=EARTH_ROTATION_COLOR,
@@ -124,10 +126,10 @@ class LatitudeView(View):
         self.p = p
 
         # gravity
-        self.gravity_arrow.update(g, p)
+        self.gravity_arrow.update(self.figure, g, p)
 
         # earth rotation axis projected in this plane (visual only)
-        self.rotation_arrow.update(omega, p)
+        self.rotation_arrow.update(self.figure, omega, p)
 
         t0 = p + self.tangent * 0.4
         t1 = p - self.tangent * 0.4
@@ -153,41 +155,38 @@ class AzimuthView(View):
 
         self.azimuth = azimuth
 
-        self.figure.add_layout_image(
-            dict(
-                source=COMPASS_ROSE,
-                xref="x",
-                yref="y",
-                x=-1.23,
-                y=1.2,
-                sizex=2.4,
-                sizey=2.4,
-                sizing="stretch",
-                opacity=0.35,
-                layer="below"
-            )
-        )
+        self.figure.add_layout_image(dict(
+            source=COMPASS_ROSE,
+            xref="x",
+            yref="y",
+            x=-1.23,
+            y=1.2,
+            sizex=2.4,
+            sizey=2.4,
+            sizing="stretch",
+            opacity=0.35,
+            layer="below"
+        ))
         rotated_aircraft = rotated_image_uri(str(AIRCRAFT_TOP_PATH), -self.azimuth)
 
-        self.figure.add_layout_image(
-            dict(
-                source=rotated_aircraft,
-                xref="x",
-                yref="y",
-                x=-1.1,
-                y=1.1,
-                sizex=2.2,
-                sizey=2.2,
-                sizing="contain",
-                opacity=1.0,
-                layer="above",
-            )
-        )
+        self.figure.add_layout_image(dict(
+            source=rotated_aircraft,
+            xref="x",
+            yref="y",
+            x=-1.1,
+            y=1.1,
+            sizex=2.2,
+            sizey=2.2,
+            sizing="contain",
+            opacity=1.0,
+            layer="above",
+        ))
         self.rotated_aircraft = self.figure.layout.images[-1]
 
         north_vector_l = np.array([0.0, 1.0])  # this should move to scene plotter
         self.north_arrow = Arrow.add_arrow(
             self.figure,
+            'north',
             north_vector_l,
             EARTH_ROTATION_LABEL,
             EARTH_ROTATION_COLOR
@@ -196,7 +195,6 @@ class AzimuthView(View):
         # =====================================================
         # HEADING VECTOR
         # =====================================================
-
         heading = np.deg2rad(self.azimuth)
         heading_vec = np.array([
             np.sin(heading),
@@ -205,6 +203,7 @@ class AzimuthView(View):
 
         self.heading_arrow = Arrow.add_arrow(
             self.figure,
+            'heading',
             heading_vec,
             r'\hat{X}',
             HIGHLIGHT_COLOR
@@ -213,12 +212,12 @@ class AzimuthView(View):
         # =====================================================
         # AZIMUTH ARC
         # =====================================================
-
         self.azimuth_arc = Arc.add_arc(
             self.figure,
-            end=heading,
+            end=heading_vec,
             label=f"{self.azimuth:.1f}°",
-            color=HIGHLIGHT_COLOR
+            color=HIGHLIGHT_COLOR,
+            radius=0.7
         )
 
         # CENTER POINT
@@ -251,7 +250,7 @@ class AzimuthView(View):
 
         # update north vector
         north_vector_l = np.array([0.0, 1.0])  # this should move to scene plotter
-        self.north_arrow.update(north_vector_l)
+        self.north_arrow.update(self.figure, north_vector_l)
 
         # update heading vector
         heading = np.deg2rad(self.azimuth)
@@ -259,7 +258,7 @@ class AzimuthView(View):
             np.sin(heading),
             np.cos(heading)
         ])  # this should move to scene plotter
-        self.heading_arrow.update(heading_vec)
+        self.heading_arrow.update(self.figure, heading_vec)
 
         # update azimuth arc
         self.azimuth_arc.update(
@@ -275,125 +274,83 @@ class CompassView(View):
 
         rotated_rose = rotated_image_uri(str(COMPASS_ROSE_PATH), self.azimuth)
 
-        self.figure.add_layout_image(
-            dict(
-                source=rotated_rose,
-                xref="x",
-                yref="y",
+        self.figure.add_layout_image(dict(
+            source=rotated_rose,
+            xref="x",
+            yref="y",
 
-                x=-1.0,
-                y=1.0,
+            x=-1.0,
+            y=1.0,
 
-                sizex=2.0,
-                sizey=2.0,
+            sizex=2.0,
+            sizey=2.0,
 
-                sizing="stretch",
-                opacity=0.95,
-                layer="below",
-            )
-        )
+            sizing="stretch",
+            opacity=0.95,
+            layer="below",
+        ))
         self.compass_rose = self.figure.layout.images[-1]
 
         # =====================================================
         # OUTER RING
         # =====================================================
-
         theta = np.linspace(0, 2 * np.pi, 400)
 
         self.figure.add_trace(go.Scatter(
             x=np.cos(theta),
             y=np.sin(theta),
-
             mode="lines",
-
-            line=dict(
-                width=5,
-                color="white"
-            ),
-
+            line=dict(width=5, color="white"),
             showlegend=False
         ))
 
         # =====================================================
         # TICKS
         # =====================================================
-
         for deg in range(0, 360, 10):
             a = np.deg2rad(deg)
-
             r0 = 0.88
             r1 = 1.0
-
             width = 4 if deg % 30 == 0 else 1
-
             self.figure.add_trace(go.Scatter(
                 x=[r0 * np.sin(a), r1 * np.sin(a)],
                 y=[r0 * np.cos(a), r1 * np.cos(a)],
-
                 mode="lines",
-
-                line=dict(
-                    width=width,
-                    color="white"
-                ),
-
+                line=dict(width=width, color="white"),
                 showlegend=False
             ))
 
         # =====================================================
         # FIXED AIRCRAFT SYMBOL
         # =====================================================
-
         self.figure.add_trace(go.Scatter(
             x=[-0.15, 0.0, 0.15],
             y=[-0.05, 0.15, -0.05],
-
             mode="lines",
-
-            line=dict(
-                width=6,
-                color=HIGHLIGHT_COLOR
-            ),
-
+            line=dict(width=6, color=HIGHLIGHT_COLOR),
             showlegend=False
         ))
 
         # =====================================================
         # FIXED LUBBER LINE
         # =====================================================
-
         self.figure.add_trace(go.Scatter(
             x=[0, 0],
             y=[0.75, 1.02],
-
             mode="lines",
-
-            line=dict(
-                width=5,
-                color="yellow"
-            ),
-
+            line=dict(width=5, color="yellow"),
             showlegend=False
         ))
 
         # =====================================================
         # DIGITAL READOUT
         # =====================================================
-
         self.figure.add_trace(go.Scatter(
             x=[0],
             y=[-0.55],
-
             mode="text",
-
             text=[f"{self.azimuth:05.1f}°"],
-
-            textfont=dict(
-                size=28,
-                family="Courier New",
-                color="white"
-            ),
-
+            textfont=dict(size=28, family="Courier New", color="white"),
             showlegend=False
         ))
 
@@ -402,33 +359,15 @@ class CompassView(View):
         # =====================================================
         # LAYOUT
         # =====================================================
-
         self.figure.update_layout(
             title="Compass View",
-
             width=600,
             height=600,
-
             plot_bgcolor="black",
             paper_bgcolor=CARD_COLOR,
-
-            xaxis=dict(
-                visible=False,
-                range=[-1.1, 1.1]
-            ),
-
-            yaxis=dict(
-                visible=False,
-                range=[-1.1, 1.1],
-                scaleanchor="x"
-            ),
-
-            margin=dict(
-                l=20,
-                r=20,
-                t=60,
-                b=20
-            )
+            xaxis=dict(visible=False, range=[-1.1, 1.1]),
+            yaxis=dict(visible=False, range=[-1.1, 1.1], scaleanchor="x"),
+            margin=dict(l=20, r=20, t=60, b=20)
         )
 
     def update(self, new_azimuth) -> None:
@@ -548,13 +487,7 @@ class Inclination3DView(View):
                 xaxis=dict(visible=False),
                 yaxis=dict(visible=False),
                 zaxis=dict(visible=False),
-                camera=dict(
-                    eye=dict(
-                        x=1.5,
-                        y=1.5,
-                        z=0.8
-                    )
-                )
+                camera=dict(eye=dict(x=1.5, y=1.5, z=0.8))
             ),
             width=600,
             height=600,
