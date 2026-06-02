@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from north.core.quaternions import Quaternion
 from north.plots.graphics_utils import (
     load_image, rotated_image_uri, add_arrow_3d, load_aircraft_mesh)
-from north.plots.primitives import Arrow, Arc
+from north.plots.primitives import Arrow, Arc, RotatedImage
 from north.plots.theme import (
     GRAVITY_COLOR, EARTH_ROTATION_COLOR,
     GRAVITY_LABEL, EARTH_ROTATION_LABEL,
@@ -167,21 +167,13 @@ class AzimuthView(View):
             opacity=0.35,
             layer="below"
         ))
-        rotated_aircraft = rotated_image_uri(str(AIRCRAFT_TOP_PATH), -self.azimuth)
 
-        self.figure.add_layout_image(dict(
-            source=rotated_aircraft,
-            xref="x",
-            yref="y",
-            x=-1.1,
-            y=1.1,
-            sizex=2.2,
-            sizey=2.2,
-            sizing="contain",
-            opacity=1.0,
-            layer="above",
-        ))
-        self.rotated_aircraft = self.figure.layout.images[-1]
+        self.rotated_aircraft = RotatedImage(
+            'aircraft',
+            str(AIRCRAFT_TOP_PATH),
+            -self.azimuth
+        )
+        self.rotated_aircraft.draw(self.figure)
 
         north_vector_l = np.array([0.0, 1.0])  # this should move to scene plotter
         self.north_arrow = Arrow.add_arrow(
@@ -214,6 +206,7 @@ class AzimuthView(View):
         # =====================================================
         self.azimuth_arc = Arc.add_arc(
             self.figure,
+            name='azimuth',
             end=heading_vec,
             label=f"{self.azimuth:.1f}°",
             color=HIGHLIGHT_COLOR,
@@ -244,9 +237,7 @@ class AzimuthView(View):
     def update(self, new_azimuth) -> None:
         self.azimuth = new_azimuth
 
-        # update aircraft picture
-        rotated_aircraft = rotated_image_uri(str(AIRCRAFT_TOP_PATH), -self.azimuth)
-        self.rotated_aircraft.source = rotated_aircraft
+        self.rotated_aircraft.update(self.figure, -self.azimuth)
 
         # update north vector
         north_vector_l = np.array([0.0, 1.0])  # this should move to scene plotter
@@ -262,6 +253,7 @@ class AzimuthView(View):
 
         # update azimuth arc
         self.azimuth_arc.update(
+            self.figure,
             new_start=heading_vec,
             new_label=f"{self.azimuth:.1f}°"
         )
@@ -272,24 +264,8 @@ class CompassView(View):
         super().__init__()
         self.azimuth = azimuth
 
-        rotated_rose = rotated_image_uri(str(COMPASS_ROSE_PATH), self.azimuth)
-
-        self.figure.add_layout_image(dict(
-            source=rotated_rose,
-            xref="x",
-            yref="y",
-
-            x=-1.0,
-            y=1.0,
-
-            sizex=2.0,
-            sizey=2.0,
-
-            sizing="stretch",
-            opacity=0.95,
-            layer="below",
-        ))
-        self.compass_rose = self.figure.layout.images[-1]
+        self.compass_rose = RotatedImage('compass_rose', str(COMPASS_ROSE_PATH), self.azimuth)
+        self.compass_rose.draw(self.figure)
 
         # =====================================================
         # OUTER RING
@@ -371,11 +347,13 @@ class CompassView(View):
         )
 
     def update(self, new_azimuth) -> None:
+        if np.isclose(new_azimuth, self.azimuth):
+            return
+
         self.azimuth = new_azimuth
 
         # update compass rose
-        compass_rose = rotated_image_uri(str(COMPASS_ROSE_PATH), self.azimuth)
-        self.compass_rose.source = compass_rose
+        self.compass_rose.update(self.figure, self.azimuth)
 
         # update digital read
         self.digital_read.text = [f"{self.azimuth:05.1f}°"]
